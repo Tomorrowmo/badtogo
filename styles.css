@@ -82,6 +82,7 @@ body.venting .screen.vent{padding-top:76px}
 .streak-meta div b{display:block;font-size:22px;font-weight:700}
 .streak-meta div span{font-size:12px;color:var(--muted)}
 .home-links{display:flex;gap:18px;justify-content:center}
+.app-ver{text-align:center;color:var(--muted);opacity:.5;font-size:12px;margin-top:6px;letter-spacing:.5px}
 /* 照见：温柔地说中用户一句 */
 .insight{text-align:center;color:#cdd2f0;font-size:15px;line-height:1.6;background:rgba(91,140,255,.08);border:1px solid rgba(91,140,255,.18);border-radius:14px;padding:14px 16px;min-height:0}
 .insight:empty{display:none}

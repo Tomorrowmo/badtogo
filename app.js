@@ -744,15 +744,27 @@
   // 任意触摸都解锁/恢复音频（移动端 AudioContext 易被系统挂起，需反复 resume）
   ['pointerdown', 'touchstart'].forEach(ev =>
     document.addEventListener(ev, () => Audio.unlock(), { passive: true }));
+
+  // 显示版本号（方便确认是否刷到最新版）
+  const APP_VERSION = 'v1.4.1';
+  $$('.app-ver').forEach(el => { el.textContent = 'BadToGo ' + APP_VERSION; });
+
   renderHome();
 
   // 注册 Service Worker（离线可用 + 可安装）。仅在安全上下文(https/localhost)生效。
   if ('serviceWorker' in navigator) {
+    // 有新版本接管时自动重载一次，让更新立刻生效（避免卡在旧缓存）
+    let refreshing = false;
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return; refreshing = true; window.location.reload();
+      });
+    }
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js').catch(() => {});
     });
   }
 
   // 暴露给调试/自检
-  window.BadToGo = { Store, go, session, Arc };
+  window.BadToGo = { Store, go, session, Arc, version: APP_VERSION };
 })();
