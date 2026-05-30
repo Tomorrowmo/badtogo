@@ -1,7 +1,7 @@
 {
-  "name": "BadToGo · 坏情绪，打包带走",
-  "short_name": "BadToGo",
-  "description": "先发泄、后平复的情绪急救工具。本地优先，隐私零上传。",
+  "name": "撒也 SAYE · 在这儿你怎样都行",
+  "short_name": "撒也",
+  "description": "先发泄、后平复的情绪急救工具。撒野也可以，哭也可以。本地优先，隐私零上传。",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",

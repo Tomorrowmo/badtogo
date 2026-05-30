@@ -750,12 +750,11 @@
     grad.addColorStop(0, '#1a1f3d'); grad.addColorStop(1, '#06070f');
     cx.fillStyle = grad; cx.fillRect(0, 0, W, H);
     cx.textAlign = 'center';
-    cx.fillStyle = '#fff'; cx.font = '800 64px sans-serif';
-    cx.fillText('Bad', W / 2 - 70, 120);
-    cx.fillStyle = '#ff7a4d'; cx.fillText('To', W / 2 + 15, 120);
-    cx.fillStyle = '#fff'; cx.fillText('Go', W / 2 + 90, 120);
-    cx.font = '28px sans-serif'; cx.fillStyle = '#9aa0c0';
-    cx.fillText('坏情绪，打包带走', W / 2, 170);
+    cx.fillStyle = '#fff'; cx.font = '800 76px sans-serif';
+    cx.fillText('撒', W / 2 - 44, 128);
+    cx.fillStyle = '#ff7a4d'; cx.fillText('也', W / 2 + 44, 128);
+    cx.font = '26px sans-serif'; cx.fillStyle = '#9aa0c0';
+    cx.fillText('撒野也可以，哭也可以', W / 2, 175);
 
     cx.font = '120px sans-serif'; cx.fillText(session.emotionEmoji || '🌫️', W / 2, 330);
     cx.font = '34px sans-serif'; cx.fillStyle = '#eef1ff';
@@ -791,8 +790,8 @@
     document.addEventListener(ev, () => Audio.unlock(), { passive: true }));
 
   // 显示版本号（方便确认是否刷到最新版）
-  const APP_VERSION = 'v1.5.1';
-  $$('.app-ver').forEach(el => { el.textContent = 'BadToGo ' + APP_VERSION; });
+  const APP_VERSION = 'v1.5.2';
+  $$('.app-ver').forEach(el => { el.textContent = '撒也 SAYE · ' + APP_VERSION; });
 
   renderHome();
 
