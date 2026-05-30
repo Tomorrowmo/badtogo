@@ -772,14 +772,28 @@
     cx.fillStyle = drop > 0 ? '#36d6c3' : '#9aa0c0'; cx.font = '700 40px sans-serif';
     cx.fillText(drop > 0 ? `情绪 ↓ ${drop} 分` : '已经发泄过了', W / 2, 660);
 
-    cx.strokeStyle = 'rgba(255,255,255,.15)'; cx.beginPath(); cx.moveTo(80, 710); cx.lineTo(W - 80, 710); cx.stroke();
+    cx.strokeStyle = 'rgba(255,255,255,.15)'; cx.beginPath(); cx.moveTo(80, 705); cx.lineTo(W - 80, 705); cx.stroke();
     cx.font = '22px sans-serif'; cx.fillStyle = '#6f79b8';
-    cx.fillText('先发泄 · 后平复 · 看见自己变好', W / 2, 755);
+    cx.fillText('先发泄 · 后平复 · 看见自己变好', W / 2, 745);
+    cx.font = '700 22px sans-serif'; cx.fillStyle = '#9aa0c0';
+    cx.fillText('微信 / 小红书 搜：撒也', W / 2, 780);
   }
   $('#downloadShare').addEventListener('click', () => {
     const cv = $('#shareCanvas');
     const a = document.createElement('a');
-    a.download = 'badtogo-share.png'; a.href = cv.toDataURL('image/png'); a.click();
+    a.download = 'saye-share.png'; a.href = cv.toDataURL('image/png'); a.click();
+  });
+  // 自传播闭环：发给正在气头上的人（系统分享 / 复制链接兜底）
+  $('#shareFriend').addEventListener('click', () => {
+    const url = location.origin + location.pathname;
+    const text = '我在「撒也」撒了会儿野，舒服多了。你也来 👉';
+    if (navigator.share) {
+      navigator.share({ title: '撒也 SAYE', text, url }).catch(() => {});
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text + ' ' + url).then(() => alert('链接已复制，发给那个正撑着的人吧'), () => {});
+    } else {
+      alert(text + ' ' + url);
+    }
   });
 
   /* =================================================================
@@ -790,7 +804,7 @@
     document.addEventListener(ev, () => Audio.unlock(), { passive: true }));
 
   // 显示版本号（方便确认是否刷到最新版）
-  const APP_VERSION = 'v1.5.2';
+  const APP_VERSION = 'v1.5.3';
   $$('.app-ver').forEach(el => { el.textContent = '撒也 SAYE · ' + APP_VERSION; });
 
   renderHome();

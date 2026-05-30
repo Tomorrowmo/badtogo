@@ -1,6 +1,6 @@
 /* BadToGo Service Worker —— 离线优先的应用外壳缓存。
  * 策略：app shell 预缓存 + 缓存优先回退网络；换版本时清旧缓存。 */
-const VERSION = 'badtogo-v1.5.2';
+const VERSION = 'badtogo-v1.5.3';
 const SHELL = [
   './',
   './index.html',

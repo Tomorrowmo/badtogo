@@ -9,12 +9,20 @@
   "scripts": {
     "start": "node server.mjs",
     "check": "node selfcheck.mjs",
-    "test": "node selfcheck.mjs && node runtime.test.mjs"
+    "test": "node selfcheck.mjs && node runtime.test.mjs",
+    "assets": "node gen-assets.mjs"
   },
-  "keywords": ["mental-health", "stress-relief", "emotion", "wellness", "pwa"],
+  "keywords": [
+    "mental-health",
+    "stress-relief",
+    "emotion",
+    "wellness",
+    "pwa"
+  ],
   "author": "BadToGo",
   "license": "MIT",
   "devDependencies": {
-    "jsdom": "^29.1.1"
+    "jsdom": "^29.1.1",
+    "qrcode": "^1.5.4"
   }
 }
