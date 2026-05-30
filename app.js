@@ -754,7 +754,7 @@
     document.addEventListener(ev, () => Audio.unlock(), { passive: true }));
 
   // 显示版本号（方便确认是否刷到最新版）
-  const APP_VERSION = 'v1.4.2';
+  const APP_VERSION = 'v1.4.3';
   $$('.app-ver').forEach(el => { el.textContent = 'BadToGo ' + APP_VERSION; });
 
   renderHome();
@@ -769,7 +769,8 @@
       });
     }
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
+      // updateViaCache:'none' → 每次都向服务器校验 sw.js，更新检测更快
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
     });
   }
 
