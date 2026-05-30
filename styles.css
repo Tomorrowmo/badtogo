@@ -24,6 +24,37 @@ body{
   -webkit-user-select:none;
 }
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+
+/* ===== 发泄弧：情绪背景层 + 顶部能量/状态 HUD + 屏震 ===== */
+#ventBg{position:fixed;inset:0;z-index:40;pointer-events:none;opacity:0;transition:opacity .45s ease;
+  background:radial-gradient(125% 85% at 50% 50%, rgba(255,90,77,0) 28%, rgba(255,40,30,.6) 100%)}
+#ventBg.flash{background:#fff;opacity:.9 !important;transition:opacity .08s}
+#ventBg.calm{background:radial-gradient(125% 85% at 50% 50%, rgba(54,214,195,0) 28%, rgba(54,214,195,.5) 100%);opacity:.6 !important}
+#arcHud{position:fixed;top:0;left:0;right:0;z-index:60;display:none;flex-direction:column;
+  padding:max(10px,env(safe-area-inset-top)) 18px 10px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(11,13,23,.92),rgba(11,13,23,0))}
+#arcHud.on{display:flex}
+.arc-bar{height:9px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin-bottom:8px;max-width:520px;width:100%;align-self:center}
+.arc-fill{height:100%;width:0;background:linear-gradient(90deg,var(--hot2),var(--hot));transition:width .15s ease}
+.arc-state{text-align:center;font-size:15px;font-weight:700;color:#ffd9c2;transition:color .3s;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+.arc-state.edge{color:#ff7a4d}
+.arc-state.burst{color:#ff5a4d;font-size:18px}
+.arc-state.calm{color:var(--calm)}
+body.venting .screen.vent{padding-top:76px}
+@keyframes arcshake{10%,90%{transform:translate(-2px,1px)}20%,80%{transform:translate(4px,-2px)}30%,50%,70%{transform:translate(-7px,2px)}40%,60%{transform:translate(7px,-1px)}}
+#app.arc-shake{animation:arcshake .5s}
+/* 个性化靶子：把惹到你的那件事写在上面 */
+.vent-label{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--ink);
+  padding:12px 14px;font-size:15px;margin-bottom:10px;font-family:inherit;text-align:center}
+.vent-label:focus{outline:none;border-color:var(--hot)}
+.vent-label::placeholder{color:var(--muted)}
+.target-label{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;
+  padding:12px;font-weight:800;font-size:18px;line-height:1.3;word-break:break-all}
+.smash-target.has-label::after{display:none}
+.smash-target.has-label .target-label{display:flex;color:#3a3f66}
+.bag-emoji{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+.punch-bag.has-label .bag-emoji{display:none}
+.punch-bag.has-label .target-label{display:flex;color:#fff;font-size:17px}
 #app{position:relative;height:100vh;width:100%;max-width:560px;margin:0 auto}
 @supports (height:100dvh){#app{height:100dvh}}
 

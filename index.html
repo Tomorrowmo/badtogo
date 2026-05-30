@@ -13,6 +13,13 @@
   <!-- 全局 Canvas：碎片/粒子特效层 -->
   <canvas id="fx" aria-hidden="true"></canvas>
 
+  <!-- 发泄弧：情绪背景层（随能量升温）+ 顶部能量/状态 HUD -->
+  <div id="ventBg" aria-hidden="true"></div>
+  <div id="arcHud" aria-hidden="true">
+    <div class="arc-bar"><div class="arc-fill" id="arcFill"></div></div>
+    <div class="arc-state" id="arcState">它还堵着。使劲。</div>
+  </div>
+
   <main id="app">
 
     <!-- ===================== 首页 ===================== -->
@@ -92,9 +99,10 @@
     <!-- ===================== 砸碎 ===================== -->
     <section class="screen vent" data-screen="vent-smash">
       <div class="vent-head"><h2>砸它，砸个稀巴烂</h2><p class="hint">点或拖，使劲砸。没人会说你。</p></div>
+      <input class="vent-label" id="smashLabel" placeholder="是什么惹到你？写上去，砸它（可不填）" maxlength="16" />
       <div class="smash-stage" id="smashStage">
         <div class="smash-counter">已砸碎 <b id="smashCount">0</b></div>
-        <div class="smash-target" id="smashTarget" role="button" aria-label="砸碎目标"></div>
+        <div class="smash-target" id="smashTarget" role="button" aria-label="砸碎目标"><span class="target-label" id="smashTargetLabel"></span></div>
       </div>
       <button class="link skip" data-vent-done>发够了，喘口气 →</button>
     </section>
@@ -114,9 +122,10 @@
     <!-- ===================== 捶打 ===================== -->
     <section class="screen vent" data-screen="vent-punch">
       <div class="vent-head"><h2>捶它，往死里捶</h2><p class="hint">连着捶，打出连击。手别停。</p></div>
+      <input class="vent-label" id="punchLabel" placeholder="是谁/什么惹到你？写上去，捶它（可不填）" maxlength="16" />
       <div class="punch-stage">
         <div class="combo" id="comboLabel">连击 <b id="comboNum">0</b></div>
-        <div class="punch-bag" id="punchBag" role="button" aria-label="出气筒">🥊</div>
+        <div class="punch-bag" id="punchBag" role="button" aria-label="出气筒"><span class="bag-emoji">🥊</span><span class="target-label" id="punchBagLabel"></span></div>
         <div class="punch-total">累计 <b id="punchTotal">0</b> 拳</div>
       </div>
       <button class="link skip" data-vent-done>发够了，喘口气 →</button>

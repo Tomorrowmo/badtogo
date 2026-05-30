@@ -149,6 +149,18 @@ log(/连点|吼碎/.test($('#screamHint').textContent), '无麦克风时显示�
 log(typeof $('#screamRing').onpointerdown === 'function', '狂点发泄已就绪(绑定了点击发泄)');
 log($('#screamStart').style.display === 'none', '无麦克风时隐藏"开启麦克风"按钮');
 
+// 发泄弧：砸到能量满 → 触发"爆" + 个性化靶子贴字
+BadToGo.go('vent-select');
+[...win.document.querySelectorAll('.mode-card')].find(c => c.dataset.mode === 'smash')
+  .dispatchEvent(new win.Event('click', { bubbles: true }));
+log(active() === 'vent-smash' && win.document.body.classList.contains('venting'), '进入发泄弧(body.venting)');
+const sl = $('#smashLabel'); sl.value = '加班'; sl.dispatchEvent(new win.Event('input', { bubbles: true }));
+log($('#smashTarget').classList.contains('has-label') && $('#smashTargetLabel').textContent === '加班', '个性化靶子已贴上"加班"');
+const tgt2 = $('#smashTarget');
+for (let i = 0; i < 20; i++) { const ev = new win.Event('pointerdown', { bubbles: true }); ev.clientX = 50; ev.clientY = 50; tgt2.dispatchEvent(ev); }
+log(BadToGo.Arc.energy() >= 100, '发泄弧能量蓄满, 实际=' + BadToGo.Arc.energy());
+log($('#arcState').textContent.includes('全部'), '触发"爆"文案(全部发出去了), 实际=' + $('#arcState').textContent);
+
 // 最终：页面内不应有 console.error
 log(errors.length === 0, '页面运行期 console.error 数=' + errors.length + (errors.length ? ' :: ' + errors.slice(0, 3).join(' | ') : ''));
 

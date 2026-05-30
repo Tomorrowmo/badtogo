@@ -268,6 +268,8 @@
     window.scrollTo(0, 0);
   }
   function onEnter(name) {
+    // 离开发泄动作页就收起发泄弧（撕掉模式不用弧）
+    if (!/^vent-(smash|punch|scream)$/.test(name)) Arc.hide();
     if (name === 'home') renderHome();
     if (name === 'breathe') resetBreathe();
     if (name === 'reflect') renderReflect();
@@ -277,6 +279,58 @@
   }
   // 通用 data-go 绑定
   $$('[data-go]').forEach(b => b.addEventListener('click', () => { Audio.unlock(); go(b.dataset.go); }));
+
+  /* =================================================================
+   * 4.5) 发泄弧：憋 → 涌 → 爆 → 松（跨所有发泄方式共享的能量）
+   *   设计：发泄动作累积能量；满了触发"爆"(全屏爆发)，再退潮转静、自动接呼吸。
+   *   见 docs/04-产品之魂：让"砸了几下"变成一段看得见、自动走向平静的旅程。
+   * ================================================================= */
+  const Arc = (function () {
+    const hud = $('#arcHud'), fill = $('#arcFill'), stateEl = $('#arcState'), bg = $('#ventBg');
+    const appEl = $('#app');
+    let energy = 0, active = false, climaxed = false;
+    const STATES = [
+      { upTo: 22, cls: '', line: '它还堵着。使劲。' },
+      { upTo: 80, cls: '', line: '对，就是这样，发出来。' },
+      { upTo: 100, cls: 'edge', line: '快了——全砸出来！' },
+    ];
+    function render() {
+      fill.style.width = energy + '%';
+      const s = STATES.find(x => energy < x.upTo) || STATES[STATES.length - 1];
+      stateEl.textContent = s.line; stateEl.className = 'arc-state ' + s.cls;
+      bg.style.opacity = (energy / 100 * 0.55).toFixed(3);
+    }
+    function show() {
+      active = true; climaxed = false; energy = 0;
+      bg.className = ''; bg.style.opacity = 0;
+      hud.classList.add('on'); document.body.classList.add('venting');
+      render();
+    }
+    function hide() {
+      active = false; hud.classList.remove('on'); document.body.classList.remove('venting');
+      bg.className = ''; bg.style.opacity = 0;
+    }
+    function add(amount, x, y) {
+      if (!active || climaxed) return;
+      energy = clamp(energy + amount, 0, 100);
+      render();
+      if (energy >= 100) climax(x, y);
+    }
+    function climax(x, y) {
+      if (climaxed || !active) return; climaxed = true;
+      const cx = x || window.innerWidth / 2, cy = y || (window.innerHeight ? window.innerHeight / 2 : 300);
+      stateEl.textContent = '🔥 全部，发出去了。'; stateEl.className = 'arc-state burst';
+      Audio.smash(); setTimeout(() => Audio.smash(), 90); vibrate([40, 30, 70]);
+      FX.burst(cx, cy, 70, { size: 22, speed: 13, life: 70 });
+      FX.burst(window.innerWidth / 2, (window.innerHeight || 600) / 2, 50, { size: 18, speed: 11, life: 72 });
+      if (session.ventLabel) FX.shatterText((session.ventLabel + ' ').repeat(4), cx, cy);
+      appEl.classList.add('arc-shake'); bg.className = 'flash';
+      setTimeout(() => { appEl.classList.remove('arc-shake'); }, 520);
+      setTimeout(() => { bg.className = 'calm'; stateEl.textContent = '松了一点了吗？'; stateEl.className = 'arc-state calm'; }, 700);
+      setTimeout(() => { if (current === 'breathe') return; hide(); go('breathe'); }, 2400);
+    }
+    return { show, hide, add, climax, isActive: () => active, energy: () => energy };
+  })();
 
   /* =================================================================
    * 5) 首页
@@ -323,9 +377,24 @@
   $$('.mode-card').forEach(c => c.addEventListener('click', () => {
     Audio.unlock();
     session.mode = c.dataset.mode; session.startedAt = Date.now();
+    session.ventLabel = '';
     Store.bumpStart(); // 漏斗起点：进入发泄
+    // 清空上一次的个性化靶子
+    ['smashLabel', 'punchLabel'].forEach(id => { const el = $('#' + id); if (el) el.value = ''; });
+    $('#smashTarget').classList.remove('has-label'); $('#smashTargetLabel').textContent = '';
+    $('#punchBag').classList.remove('has-label'); $('#punchBagLabel').textContent = '';
+    if (c.dataset.mode !== 'shred') Arc.show(); // 撕掉模式本身就是写→毁，不用能量弧
     go('vent-' + c.dataset.mode);
   }));
+
+  // 个性化靶子：把惹到你的那件事写在靶子上
+  function setVentLabel(val, targetSel, labelSel) {
+    session.ventLabel = (val || '').trim();
+    const t = $(labelSel); if (t) t.textContent = session.ventLabel;
+    const tg = $(targetSel); if (tg) tg.classList.toggle('has-label', !!session.ventLabel);
+  }
+  if ($('#smashLabel')) $('#smashLabel').addEventListener('input', e => setVentLabel(e.target.value, '#smashTarget', '#smashTargetLabel'));
+  if ($('#punchLabel')) $('#punchLabel').addEventListener('input', e => setVentLabel(e.target.value, '#punchBag', '#punchBagLabel'));
   // 任意"发泄够了"→ 进呼吸
   $$('[data-vent-done]').forEach(b => b.addEventListener('click', () => go('breathe')));
 
@@ -370,6 +439,7 @@
     smashTarget.classList.remove('hit'); void smashTarget.offsetWidth; smashTarget.classList.add('hit');
     FX.burst(clientX, clientY, 26, { colors: ['#cfd6ff', '#8a93c9', '#ffffff', '#6f79b8'], size: 16, speed: 8, life: 55 });
     if (smashCount % 5 === 0) FX.burst(clientX, clientY, 40, { size: 20, speed: 11, life: 60 });
+    Arc.add(6, clientX, clientY); // 蓄能
   }
   smashTarget.addEventListener('pointerdown', e => doSmash(e.clientX, e.clientY));
   // 拖拽连砸
@@ -391,10 +461,12 @@
     screamRing.style.cursor = 'pointer';
     screamRing.onpointerdown = () => {
       const r = screamRing.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
       Audio.smash(); vibrate(20);
-      FX.burst(r.left + r.width / 2, r.top + r.height / 2, 18, { size: 14, speed: 9, life: 45 });
+      FX.burst(cx, cy, 18, { size: 14, speed: 9, life: 45 });
       screamRing.style.transform = 'scale(1.32)';
       setTimeout(() => screamRing.style.transform = 'scale(1)', 100);
+      Arc.add(8, cx, cy); // 蓄能
     };
   }
   function resetScream() {
@@ -434,7 +506,8 @@
         screamRing.style.transform = `scale(${sc})`;
         screamRing.style.boxShadow = `0 0 ${level}px ${level / 6}px rgba(255,90,77,.5)`;
         if (level > screamPeak) { screamPeak = level; $('#screamPeak').textContent = Math.round(level); }
-        if (level > 55) {
+        if (level > 50) {
+          Arc.add(0.5); // 吼得越久越满
           const r = screamRing.getBoundingClientRect();
           if (Math.random() < 0.4) FX.burst(r.left + r.width / 2, r.top + r.height / 2, 10, { size: 12, speed: 9, life: 40 });
         }
@@ -468,6 +541,7 @@
     Audio.punch(); vibrate(30);
     punchBag.classList.remove('hit'); void punchBag.offsetWidth; punchBag.classList.add('hit');
     FX.burst(x, y, 14, { colors: ['#ff7a6e', '#c8342a', '#ffd24d', '#ffffff'], size: 13, speed: 7, life: 45 });
+    Arc.add(5, x, y); // 蓄能
     clearTimeout(comboTimer);
     comboTimer = setTimeout(() => { combo = 0; $('#comboNum').textContent = 0; }, 1200);
   }
@@ -680,5 +754,5 @@
   }
 
   // 暴露给调试/自检
-  window.BadToGo = { Store, go, session };
+  window.BadToGo = { Store, go, session, Arc };
 })();
