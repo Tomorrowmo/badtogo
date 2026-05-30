@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0d17" />
+  <meta name="description" content="BadToGo——先发泄、后平复的情绪急救工具。坏情绪，打包带走。" />
+  <title>BadToGo · 坏情绪，打包带走</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.webmanifest" />
+</head>
+<body>
+  <!-- 全局 Canvas：碎片/粒子特效层 -->
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <main id="app">
+
+    <!-- ===================== 首页 ===================== -->
+    <section class="screen active" data-screen="home">
+      <div class="home-inner">
+        <div class="brand">
+          <div class="logo">Bad<span>To</span>Go</div>
+          <p class="tagline">坏情绪，打包带走。</p>
+        </div>
+        <div class="streak-card" id="streakCard">
+          <div class="streak-num"><span id="streakNum">0</span><small>天连续</small></div>
+          <div class="streak-meta">
+            <div><b id="totalSessions">0</b><span>次清空</span></div>
+            <div><b id="avgDrop">—</b><span>平均降幅</span></div>
+          </div>
+        </div>
+        <button class="btn-primary big" data-go="checkin">我现在很烦 → 开始</button>
+        <div class="home-links">
+          <button class="link" data-go="trends">情绪趋势</button>
+          <button class="link" data-go="about">关于 / 隐私</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== Check-in ===================== -->
+    <section class="screen" data-screen="checkin">
+      <div class="step-head">
+        <span class="step-tag">第 1 步 · 命名它</span>
+        <h2>你现在主要是什么情绪？</h2>
+        <p class="hint">能说出名字，就已经开始掌控它。</p>
+      </div>
+      <div class="emotion-grid" id="emotionGrid"></div>
+      <div class="slider-wrap">
+        <label>强烈程度：<b><span id="intensityVal">5</span></b> / 10</label>
+        <input type="range" id="intensity" min="0" max="10" value="5" />
+        <div class="slider-scale"><span>平静</span><span>快爆炸</span></div>
+      </div>
+      <button class="btn-primary" id="toVent" disabled>选个方式发泄 →</button>
+      <button class="link back" data-go="home">返回</button>
+    </section>
+
+    <!-- ===================== 选择发泄模式 ===================== -->
+    <section class="screen" data-screen="vent-select">
+      <div class="step-head">
+        <span class="step-tag">第 2 步 · 发出去</span>
+        <h2>你想怎么发泄？</h2>
+        <p class="hint">选一个，把它发出去。</p>
+      </div>
+      <div class="mode-grid">
+        <button class="mode-card" data-mode="shred">
+          <div class="mode-ico">✍️</div><b>撕掉</b><span>写下来，撕得粉碎</span>
+        </button>
+        <button class="mode-card" data-mode="smash">
+          <div class="mode-ico">🔨</div><b>砸碎</b><span>砸个稀巴烂</span>
+        </button>
+        <button class="mode-card" data-mode="scream">
+          <div class="mode-ico">📣</div><b>吼出来</b><span>对着麦克风吼</span>
+        </button>
+        <button class="mode-card" data-mode="punch">
+          <div class="mode-ico">🥊</div><b>捶打</b><span>连击出气筒</span>
+        </button>
+      </div>
+      <button class="link back" data-go="checkin">返回</button>
+    </section>
+
+    <!-- ===================== 撕掉 ===================== -->
+    <section class="screen vent" data-screen="vent-shred">
+      <div class="vent-head"><h2>把烦你的事写下来</h2><p class="hint">没人会看到，写完就让它灰飞烟灭。文字只在你这台设备，绝不上传。</p></div>
+      <textarea id="shredText" placeholder="今天最让我受不了的是……" maxlength="2000"></textarea>
+      <div class="shred-actions">
+        <button class="chip" data-shred="tear">撕碎</button>
+        <button class="chip" data-shred="burn">烧掉</button>
+        <button class="chip" data-shred="hole">扔进黑洞</button>
+      </div>
+      <button class="link skip" data-vent-done>发泄够了 → 平复一下</button>
+    </section>
+
+    <!-- ===================== 砸碎 ===================== -->
+    <section class="screen vent" data-screen="vent-smash">
+      <div class="vent-head"><h2>砸它！</h2><p class="hint">点或拖，把它砸个稀巴烂。</p></div>
+      <div class="smash-stage" id="smashStage">
+        <div class="smash-counter">已砸碎 <b id="smashCount">0</b></div>
+        <div class="smash-target" id="smashTarget" role="button" aria-label="砸碎目标"></div>
+      </div>
+      <button class="link skip" data-vent-done>发泄够了 → 平复一下</button>
+    </section>
+
+    <!-- ===================== 吼出来 ===================== -->
+    <section class="screen vent" data-screen="vent-scream">
+      <div class="vent-head"><h2>对着它吼</h2><p class="hint" id="screamHint">点下面授权麦克风，越大声，冲击越猛。</p></div>
+      <div class="scream-stage">
+        <div class="scream-ring" id="screamRing"></div>
+        <div class="scream-meter"><div class="scream-fill" id="screamFill"></div></div>
+        <div class="scream-peak">峰值音量 <b id="screamPeak">0</b></div>
+      </div>
+      <button class="btn-primary" id="screamStart">开启麦克风</button>
+      <button class="link skip" data-vent-done>发泄够了 → 平复一下</button>
+    </section>
+
+    <!-- ===================== 捶打 ===================== -->
+    <section class="screen vent" data-screen="vent-punch">
+      <div class="vent-head"><h2>捶它！</h2><p class="hint">连续点击/敲打，打出连击。</p></div>
+      <div class="punch-stage">
+        <div class="combo" id="comboLabel">连击 <b id="comboNum">0</b></div>
+        <div class="punch-bag" id="punchBag" role="button" aria-label="出气筒">🥊</div>
+        <div class="punch-total">累计 <b id="punchTotal">0</b> 拳</div>
+      </div>
+      <button class="link skip" data-vent-done>发泄够了 → 平复一下</button>
+    </section>
+
+    <!-- ===================== 呼吸平复 ===================== -->
+    <section class="screen" data-screen="breathe">
+      <div class="step-head">
+        <span class="step-tag">第 3 步 · 平复</span>
+        <h2>跟着圆圈呼吸</h2>
+        <p class="hint">发泄完别停在最激动的点。慢呼吸能把身体拉回平静——这一步才真正有用。</p>
+      </div>
+      <div class="breathe-stage">
+        <div class="breathe-orb" id="breatheOrb"><span id="breathePhase">准备</span></div>
+        <div class="breathe-count">第 <b id="breatheCycle">0</b> / <span id="breatheTotal">4</span> 轮</div>
+      </div>
+      <div class="breathe-controls">
+        <button class="chip active" data-pattern="box">盒式 4-4-4-4</button>
+        <button class="chip" data-pattern="exhale">延长呼气 4-6</button>
+      </div>
+      <button class="btn-primary" id="breatheStart">开始呼吸</button>
+      <button class="link skip" id="toReflect">够了，看看效果 →</button>
+    </section>
+
+    <!-- ===================== 复盘 ===================== -->
+    <section class="screen" data-screen="reflect">
+      <div class="step-head">
+        <span class="step-tag">第 4 步 · 看见变化</span>
+        <h2>现在感觉怎么样？</h2>
+        <p class="hint">再给现在的情绪打个分。</p>
+      </div>
+      <div class="slider-wrap">
+        <label>现在的强烈程度：<b><span id="afterVal">3</span></b> / 10</label>
+        <input type="range" id="afterIntensity" min="0" max="10" value="3" />
+        <div class="slider-scale"><span>平静</span><span>快爆炸</span></div>
+      </div>
+      <div class="result-card" id="resultCard"></div>
+      <button class="btn-primary" id="saveSession">完成 · 记录这次</button>
+      <button class="link" id="toShare">生成分享卡 →</button>
+    </section>
+
+    <!-- ===================== 分享卡 ===================== -->
+    <section class="screen" data-screen="share">
+      <div class="step-head"><h2>今天，我清空了一点坏情绪</h2></div>
+      <canvas id="shareCanvas" width="640" height="800"></canvas>
+      <button class="btn-primary" id="downloadShare">保存图片</button>
+      <button class="link" data-go="home">回首页</button>
+    </section>
+
+    <!-- ===================== 趋势 ===================== -->
+    <section class="screen" data-screen="trends">
+      <div class="step-head"><h2>情绪趋势</h2><p class="hint">只存在你本机。下面是你每次发泄前后的分数。</p></div>
+      <div class="trend-stats" id="trendStats"></div>
+      <canvas id="trendCanvas" width="680" height="320"></canvas>
+      <div class="trend-list" id="trendList"></div>
+      <button class="link danger" id="clearData">清空全部本地数据</button>
+      <button class="link back" data-go="home">返回</button>
+    </section>
+
+    <!-- ===================== 关于 ===================== -->
+    <section class="screen" data-screen="about">
+      <div class="step-head"><h2>关于 BadToGo</h2></div>
+      <div class="about-body">
+        <p><b>它做什么：</b>先让你安全地发泄（撕/砸/吼/捶），再用循证呼吸把你拉回平静，最后让你看见情绪分下降。</p>
+        <p><b>隐私：</b>不需要注册、不联网、不收集任何个人信息。你写下的内容只在本设备内存中，销毁动画后即丢弃；情绪记录只存于本机浏览器，可一键清空。</p>
+        <p><b>循证：</b>单纯发泄会抬高愤怒（Bushman, 2002），所以我们一定带你做平复呼吸；"写下来再丢掉"能降低负面想法的影响（Briñol 等, 2013）。</p>
+        <p class="warn"><b>重要：</b>BadToGo 不是医疗或诊断工具，不能替代专业心理治疗。如果你有持续的痛苦、自伤或伤害他人的念头，请立即寻求专业帮助——中国大陆可拨打心理援助热线 <b>400-161-9995</b>（24 小时）；紧急情况请拨打 <b>110 / 120</b>。</p>
+      </div>
+      <button class="link back" data-go="home">返回</button>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

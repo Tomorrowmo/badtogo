@@ -1,0 +1,24 @@
+# BadToGo · 备选方案：用 Node 直接跑 server.mjs（不装 nginx 时用）
+# 放置位置：/etc/systemd/system/badtogo.service
+# 适合先快速跑起来；正式生产仍建议 nginx + HTTPS（吼模式需 https）。
+#
+# 启用：
+#   sudo cp deploy/badtogo-node.service /etc/systemd/system/badtogo.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now badtogo
+#   # 然后在阿里云轻量服务器“防火墙”里放行 5173 端口
+[Unit]
+Description=BadToGo static server
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/badtogo
+Environment=PORT=5173
+ExecStart=/usr/bin/node /var/www/badtogo/server.mjs
+Restart=always
+RestartSec=3
+User=www-data
+
+[Install]
+WantedBy=multi-user.target

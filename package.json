@@ -1,0 +1,20 @@
+{
+  "name": "badtogo",
+  "version": "1.0.0",
+  "description": "BadToGo — 先发泄、后平复的情绪急救工具。本地优先，隐私零上传。",
+  "main": "app.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "check": "node selfcheck.mjs",
+    "test": "node selfcheck.mjs && node runtime.test.mjs"
+  },
+  "keywords": ["mental-health", "stress-relief", "emotion", "wellness", "pwa"],
+  "author": "BadToGo",
+  "license": "MIT",
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}
