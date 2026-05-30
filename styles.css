@@ -34,13 +34,19 @@ body{
   padding:max(10px,env(safe-area-inset-top)) 18px 10px;pointer-events:none;
   background:linear-gradient(180deg,rgba(11,13,23,.92),rgba(11,13,23,0))}
 #arcHud.on{display:flex}
-.arc-bar{height:9px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin-bottom:8px;max-width:520px;width:100%;align-self:center}
-.arc-fill{height:100%;width:0;background:linear-gradient(90deg,var(--hot2),var(--hot));transition:width .15s ease}
+/* 快炸的气团：会鼓、会抖、会红，满了炸开 */
+.arc-orb-slot{height:66px;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+.arc-orb{width:30px;height:30px;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%, hsl(168,95%,72%), hsl(168,85%,46%));
+  box-shadow:0 0 10px 0 hsla(168,90%,55%,.6);
+  transform:scale(1);transition:transform .12s ease, background .3s, box-shadow .3s}
+@keyframes orbtremble{0%,100%{margin:0 0 0 0}20%{margin:0 0 0 -4px}40%{margin:-3px 0 0 4px}60%{margin:3px 0 0 -3px}80%{margin:0 0 0 3px}}
+.arc-orb.tremble{animation:orbtremble .1s infinite}
 .arc-state{text-align:center;font-size:15px;font-weight:700;color:#ffd9c2;transition:color .3s;text-shadow:0 1px 6px rgba(0,0,0,.5)}
 .arc-state.edge{color:#ff7a4d}
 .arc-state.burst{color:#ff5a4d;font-size:18px}
 .arc-state.calm{color:var(--calm)}
-body.venting .screen.vent{padding-top:76px}
+body.venting .screen.vent{padding-top:98px}
 body.in-vent .screen.vent{padding-bottom:88px}
 /* 发泄方式切换条 */
 #ventSwitch{position:fixed;bottom:0;left:0;right:0;z-index:60;display:none;justify-content:center;gap:8px;

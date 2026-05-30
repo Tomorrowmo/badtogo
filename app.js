@@ -291,7 +291,7 @@
    *   见 docs/04-产品之魂：让"砸了几下"变成一段看得见、自动走向平静的旅程。
    * ================================================================= */
   const Arc = (function () {
-    const hud = $('#arcHud'), fill = $('#arcFill'), stateEl = $('#arcState'), bg = $('#ventBg');
+    const hud = $('#arcHud'), orb = $('#arcOrb'), stateEl = $('#arcState'), bg = $('#ventBg');
     const appEl = $('#app');
     let energy = 0, active = false, climaxed = false;
     const STATES = [
@@ -299,11 +299,19 @@
       { upTo: 80, cls: '', line: '对，就是这样，发出来。' },
       { upTo: 100, cls: 'edge', line: '快了——全砸出来！' },
     ];
+    function paintOrb(p) {
+      const h = Math.round(168 * (1 - p)); // 168(青)→0(红)
+      orb.style.transform = 'scale(' + (1 + p * 1.6) + ')';
+      orb.style.background = 'radial-gradient(circle at 40% 35%, hsl(' + h + ',95%,72%), hsl(' + h + ',85%,46%))';
+      orb.style.boxShadow = '0 0 ' + (10 + p * 46) + 'px ' + (p * 16) + 'px hsla(' + h + ',90%,55%,.6)';
+      orb.classList.toggle('tremble', p > 0.65);
+    }
     function render() {
-      fill.style.width = energy + '%';
+      const p = energy / 100;
+      paintOrb(p);
       const s = STATES.find(x => energy < x.upTo) || STATES[STATES.length - 1];
       stateEl.textContent = s.line; stateEl.className = 'arc-state ' + s.cls;
-      bg.style.opacity = (energy / 100 * 0.55).toFixed(3);
+      bg.style.opacity = (p * 0.55).toFixed(3);
     }
     function show() {
       active = true; climaxed = false; energy = 0;
@@ -331,6 +339,12 @@
       if (climaxed || !active) return; climaxed = true;
       const cx = x || window.innerWidth / 2, cy = y || (window.innerHeight ? window.innerHeight / 2 : 300);
       stateEl.textContent = '🔥 全部，发出去了。'; stateEl.className = 'arc-state burst';
+      // 气团"炸开"：碎成粒子 → 只剩一小团平静
+      orb.classList.remove('tremble');
+      orb.style.transition = 'transform .2s, background .4s, box-shadow .4s';
+      orb.style.transform = 'scale(.5)';
+      orb.style.background = 'radial-gradient(circle at 40% 35%, #aef7ec, #36d6c3)';
+      orb.style.boxShadow = '0 0 18px 3px rgba(54,214,195,.5)';
       Audio.smash(); setTimeout(() => Audio.smash(), 90); vibrate([40, 30, 70]);
       FX.burst(cx, cy, 70, { size: 22, speed: 13, life: 70 });
       FX.burst(window.innerWidth / 2, (window.innerHeight || 600) / 2, 50, { size: 18, speed: 11, life: 72 });
@@ -344,6 +358,8 @@
         if (!active) return;
         climaxed = false; energy = 0;
         bg.className = ''; bg.style.opacity = 0;
+        orb.style.transition = 'transform .12s ease, background .3s, box-shadow .3s';
+        paintOrb(0); // 气团缩回小小一团，等你再来
         stateEl.className = 'arc-state';
         stateEl.textContent = '发够了吗？没够就接着来 · 够了就点下面「喘口气 →」';
       }, 2400);
@@ -775,7 +791,7 @@
     document.addEventListener(ev, () => Audio.unlock(), { passive: true }));
 
   // 显示版本号（方便确认是否刷到最新版）
-  const APP_VERSION = 'v1.5.0';
+  const APP_VERSION = 'v1.5.1';
   $$('.app-ver').forEach(el => { el.textContent = 'BadToGo ' + APP_VERSION; });
 
   renderHome();
