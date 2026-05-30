@@ -327,7 +327,15 @@
       appEl.classList.add('arc-shake'); bg.className = 'flash';
       setTimeout(() => { appEl.classList.remove('arc-shake'); }, 520);
       setTimeout(() => { bg.className = 'calm'; stateEl.textContent = '松了一点了吗？'; stateEl.className = 'arc-state calm'; }, 700);
-      setTimeout(() => { if (current === 'breathe') return; hide(); go('breathe'); }, 2400);
+      // 不强制进入呼吸——发没发够、要不要继续，全由用户自己定（"允许做自己"）。
+      // 爆完重置：想再来一轮就接着发，够了自己点底部的"喘口气 →"。
+      setTimeout(() => {
+        if (!active) return;
+        climaxed = false; energy = 0;
+        bg.className = ''; bg.style.opacity = 0;
+        stateEl.className = 'arc-state';
+        stateEl.textContent = '发够了吗？没够就接着来 · 够了就点下面「喘口气 →」';
+      }, 2400);
     }
     return { show, hide, add, climax, isActive: () => active, energy: () => energy };
   })();
@@ -746,7 +754,7 @@
     document.addEventListener(ev, () => Audio.unlock(), { passive: true }));
 
   // 显示版本号（方便确认是否刷到最新版）
-  const APP_VERSION = 'v1.4.1';
+  const APP_VERSION = 'v1.4.2';
   $$('.app-ver').forEach(el => { el.textContent = 'BadToGo ' + APP_VERSION; });
 
   renderHome();
