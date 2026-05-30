@@ -51,4 +51,14 @@ const posters = [
 ];
 for (const p of posters) await writeFile('assets/' + p.name, poster(p));
 
-console.log('已生成：assets/qr-saye.png + ' + posters.map(p => p.name).join(' / '));
+// 同时输出可直接上传小红书的 PNG（需 sharp；缺失则仅保留 SVG）
+try {
+  const sharp = (await import('sharp')).default;
+  for (const p of posters) {
+    const png = p.name.replace('.svg', '.png');
+    await sharp('assets/' + p.name, { density: 200 }).png().toFile('assets/' + png);
+  }
+  console.log('已生成：assets/qr-saye.png + 3 张海报(SVG+PNG)');
+} catch (e) {
+  console.log('已生成 SVG 海报；PNG 跳过（如需 PNG：npm i -D sharp 后重跑）。原因：' + e.message);
+}

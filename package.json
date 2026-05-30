@@ -23,6 +23,7 @@
   "license": "MIT",
   "devDependencies": {
     "jsdom": "^29.1.1",
-    "qrcode": "^1.5.4"
+    "qrcode": "^1.5.4",
+    "sharp": "^0.34.5"
   }
 }
