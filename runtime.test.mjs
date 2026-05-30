@@ -138,6 +138,13 @@ log(active() === 'share', '分享卡页可进入');
 // 校验 streak/avgDrop 计算
 log($('#avgDrop'), 'avgDrop 计算执行');
 
+// 吼模式：非安全上下文(无麦克风)应优雅降级为"狂点发泄"，不报错
+BadToGo.go('vent-scream');
+log(active() === 'vent-scream', '可进入吼模式, 实际=' + active());
+log(/连点|吼碎/.test($('#screamHint').textContent), '无麦克风时显示狂点引导文案, 实际=' + $('#screamHint').textContent);
+log(typeof $('#screamRing').onpointerdown === 'function', '狂点发泄已就绪(绑定了点击发泄)');
+log($('#screamStart').style.display === 'none', '无麦克风时隐藏"开启麦克风"按钮');
+
 // 最终：页面内不应有 console.error
 log(errors.length === 0, '页面运行期 console.error 数=' + errors.length + (errors.length ? ' :: ' + errors.slice(0, 3).join(' | ') : ''));
 

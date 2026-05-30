@@ -54,15 +54,21 @@
       // 玻璃/盘子碎裂：高通噪声爆发 + 几声高频叮
       smash() {
         const c = ensure(); if (!c) return; const t = c.currentTime;
+        // ① 低频闷响：给"砸下去"加重量感
+        const thud = c.createOscillator(); thud.type = 'sine';
+        thud.frequency.setValueAtTime(150, t); thud.frequency.exponentialRampToValueAtTime(45, t + 0.18);
+        const tg = c.createGain(); env(tg, 0.6, 0.22, t);
+        thud.connect(tg).connect(c.destination); thud.start(t); thud.stop(t + 0.25);
+        // ② 高频碎裂噪声
         const src = c.createBufferSource(); src.buffer = noise();
         const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1800;
-        const g = c.createGain(); env(g, 0.5, 0.25, t);
+        const g = c.createGain(); env(g, 0.55, 0.25, t);
         src.connect(hp).connect(g).connect(c.destination); src.start(t); src.stop(t + 0.3);
+        // ③ 玻璃碎片叮叮声
         [2300, 3100, 4200].forEach((f, i) => {
-          const o = c.createOsc ? c.createOsc() : c.createOscillator();
-          const og = c.createGain(); o.type = 'triangle';
+          const o = c.createOscillator(); const og = c.createGain(); o.type = 'triangle';
           o.frequency.setValueAtTime(f * (1 + Math.random() * .2), t + i * 0.02);
-          env(og, 0.18, 0.18, t + i * 0.02);
+          env(og, 0.2, 0.18, t + i * 0.02);
           o.connect(og).connect(c.destination); o.start(t + i * 0.02); o.stop(t + 0.25);
         });
       },
@@ -350,11 +356,33 @@
    * ================================================================= */
   let micStream = null, analyser = null, micRAF = null, screamPeak = 0;
   const screamRing = $('#screamRing'), screamFill = $('#screamFill');
+  // 仅在"安全上下文"(https/localhost)且浏览器支持时，麦克风才可用。
+  // http://IP 下浏览器禁止麦克风——此时不去申请，直接用"狂点发泄"，避免刺眼报错。
+  const micSupported = !!(window.isSecureContext && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  function enableTapVent() {
+    screamRing.style.cursor = 'pointer';
+    screamRing.onpointerdown = () => {
+      const r = screamRing.getBoundingClientRect();
+      Audio.smash(); vibrate(20);
+      FX.burst(r.left + r.width / 2, r.top + r.height / 2, 18, { size: 14, speed: 9, life: 45 });
+      screamRing.style.transform = 'scale(1.32)';
+      setTimeout(() => screamRing.style.transform = 'scale(1)', 100);
+    };
+  }
   function resetScream() {
     screamPeak = 0; $('#screamPeak').textContent = '0';
     screamFill.style.width = '0%'; screamRing.style.transform = 'scale(1)';
-    $('#screamStart').style.display = '';
-    $('#screamHint').textContent = '点下面授权麦克风，越大声，冲击越猛。';
+    screamRing.onpointerdown = null; screamRing.style.cursor = '';
+    if (micSupported) {
+      $('#screamStart').style.display = '';
+      $('#screamStart').textContent = '开启麦克风';
+      $('#screamHint').textContent = '点下面开启麦克风，越大声，冲击越猛。';
+    } else {
+      // 非安全环境：直接进入"狂点发泄"，正面引导
+      $('#screamStart').style.display = 'none';
+      $('#screamHint').textContent = '用力快速连点下面的圆圈，把它吼碎！';
+      enableTapVent();
+    }
   }
   async function startScream() {
     Audio.unlock();
@@ -386,17 +414,10 @@
       };
       tick();
     } catch (err) {
-      // 无麦克风权限 → 退化为"点击爆发"模式，保证可用
-      $('#screamHint').textContent = '没拿到麦克风权限。没关系——快速狂点下面的圆圈来发泄！';
+      // 用户拒绝授权 → 退化为"狂点发泄"，正面引导，不报错
+      $('#screamHint').textContent = '没开麦克风也行——快速狂点下面的圆圈发泄！';
       $('#screamStart').style.display = 'none';
-      screamRing.style.cursor = 'pointer';
-      screamRing.onclick = () => {
-        const r = screamRing.getBoundingClientRect();
-        Audio.smash(); vibrate(20);
-        FX.burst(r.left + r.width / 2, r.top + r.height / 2, 16, { size: 14, speed: 8, life: 45 });
-        screamRing.style.transform = 'scale(1.3)';
-        setTimeout(() => screamRing.style.transform = 'scale(1)', 100);
-      };
+      enableTapVent();
     }
   }
   function stopScream() {
@@ -611,8 +632,9 @@
   /* =================================================================
    * 16) 启动
    * ================================================================= */
-  // 任意首次交互解锁音频
-  document.addEventListener('pointerdown', () => Audio.unlock(), { once: true });
+  // 任意触摸都解锁/恢复音频（移动端 AudioContext 易被系统挂起，需反复 resume）
+  ['pointerdown', 'touchstart'].forEach(ev =>
+    document.addEventListener(ev, () => Audio.unlock(), { passive: true }));
   renderHome();
 
   // 注册 Service Worker（离线可用 + 可安装）。仅在安全上下文(https/localhost)生效。
