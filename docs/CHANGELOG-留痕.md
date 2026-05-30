@@ -126,4 +126,29 @@
 
 ---
 
+---
+
+## 2026-05-30 · 🔊 上线 HTTPS（GitHub Pages），「吼」功能可用
+
+**事件**：产品上线境外 HTTPS 地址 **https://tomorrowmo.github.io/badtogo/**，麦克风「吼」模式与离线安装首次可用。
+
+### 关键过程与决策
+
+1. **为什么换 GitHub Pages**：用户最看重的「吼」需要麦克风 → 麦克风需安全上下文(HTTPS)。当前大陆服务器是 http，吼用不了。
+2. **试过、失败的偏方（重要教训）**：曾尝试在大陆服务器用 `nip.io + Let's Encrypt` 免备案配 HTTPS，certbot HTTP-01 验证被**连接重置**——证实**大陆服务器上未备案域名走 80 端口会被网络层封锁**，纯 IP 能通是因为没有域名 Host。结论：**大陆服务器绕不开备案**；要免备案 HTTPS 必须**境外托管**。
+3. **境外托管的硬约束**：Vercel/Cloudflare/GitHub Pages 都需用户**本人账号登录一次**，AI 无法代登录。GitHub Pages 最省事——代码已在仓库，只需用户在 Settings→Pages 把 Source 设为 GitHub Actions（一个开关），其余由已写好的 `.github/workflows/pages.yml` 自动完成。
+4. **enablement 坑**：`actions/configure-pages@v5` 的 `enablement:true` 首次失败（GITHUB_TOKEN 无权擅自开启 Pages），用户手动设 Source=GitHub Actions 后，推空提交重触发即成功。
+
+### 验证（作证）
+
+- Actions 运行 conclusion=success；`https://tomorrowmo.github.io/badtogo/` 及全部 6 个资源均 HTTPS 200。
+- 安全上下文 ⇒ 麦克风「吼」、Service Worker 离线、PWA 安装 全部可用。
+
+### 取舍与下一步
+
+- 缺点：github.io 在大陆访问偶尔慢。定位为「验证/自测/给朋友试」够用。
+- 大规模面向国内：后续走 Cloudflare（稍稳）或正式 ICP 备案 + 大陆服务器；要收钱再注册个体户升级微信小程序。
+
+---
+
 > 后续重大事件（首批用户数据、首个付费/企业客户、融资）继续在此追加，每条都带"为什么"。

@@ -4,7 +4,8 @@
 
 ![status](https://img.shields.io/badge/tests-23%2F23%20passing-brightgreen) ![type](https://img.shields.io/badge/stack-zero--dependency%20web-blue) ![privacy](https://img.shields.io/badge/privacy-local--first-success)
 
-> 🌐 **线上体验**：http://39.96.207.137:9000/ （http 端口部署，撕/砸/捶/呼吸/记录/趋势/分享全可用；离线安装与「吼」模式需配域名+HTTPS 后启用）
+> 🌐 **线上体验（HTTPS，「吼」可用）**：https://tomorrowmo.github.io/badtogo/ — 免费托管、自动 HTTPS，全部功能（含麦克风「吼」、离线安装）均可用。
+> 备用（大陆服务器，http）：http://39.96.207.137:9000/ （http 下「吼」与离线安装不可用）
 
 ---
 
