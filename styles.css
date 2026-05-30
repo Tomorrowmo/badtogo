@@ -51,6 +51,9 @@ body{
 .streak-meta div b{display:block;font-size:22px;font-weight:700}
 .streak-meta div span{font-size:12px;color:var(--muted)}
 .home-links{display:flex;gap:18px;justify-content:center}
+/* 照见：温柔地说中用户一句 */
+.insight{text-align:center;color:#cdd2f0;font-size:15px;line-height:1.6;background:rgba(91,140,255,.08);border:1px solid rgba(91,140,255,.18);border-radius:14px;padding:14px 16px;min-height:0}
+.insight:empty{display:none}
 
 /* ---------- 通用文字/按钮 ---------- */
 .step-head{margin-bottom:18px}
@@ -154,7 +157,7 @@ input[type=range]::-moz-range-thumb{width:28px;height:28px;border:0;border-radiu
 
 /* ---------- 复盘 ---------- */
 .result-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin:8px 0 0;min-height:80px;display:flex;flex-direction:column;gap:8px;justify-content:center}
-.result-card .big-drop{font-size:30px;font-weight:800}
+.result-card .big-drop{font-size:21px;font-weight:800;line-height:1.4}
 .result-card .down{color:var(--calm)}
 .result-card .up{color:var(--hot)}
 .result-card .same{color:var(--muted)}

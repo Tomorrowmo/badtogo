@@ -215,6 +215,25 @@
     bumpStart() { localStorage.setItem(this.STARTS, String(this.starts() + 1)); },
     starts() { return parseInt(localStorage.getItem(this.STARTS) || '0', 10) || 0; },
     completionRate() { const s = this.starts(); return s ? Math.round(this.all().length / s * 100) : 0; },
+    // 显影：用现成的本地数据，照出用户自己没察觉的模式（无需 AI）
+    insight() {
+      const a = this.all();
+      if (!a.length) return '第一次来。在这儿，你可以不懂事。';
+      const weekAgo = Date.now() - 7 * 24 * 3600 * 1000;
+      const week = a.filter(r => r.t >= weekAgo);
+      // 最近最常出现的情绪
+      const recent = a.slice(-20); const cnt = {};
+      recent.forEach(r => { if (r.emotion) cnt[r.emotion] = (cnt[r.emotion] || 0) + 1; });
+      let topEmo = null, topN = 0;
+      for (const k in cnt) if (cnt[k] > topN) { topN = cnt[k]; topEmo = k; }
+      // 深夜来的比例
+      const night = a.filter(r => { const h = new Date(r.t).getHours(); return h >= 22 || h < 3; }).length;
+      if (week.length >= 3 && topEmo && topN >= 3) return `这周你第 ${week.length} 次来了。最近，「${topEmo}」总缠着你。`;
+      if (week.length >= 3) return `这周你已经来了 ${week.length} 次。最近是不是有点撑着？`;
+      if (night >= 3 && night / a.length > 0.5) return '你总在深夜才来。白天，大概都忍着吧。';
+      if (topEmo && topN >= 3) return `最常惹到你的，是「${topEmo}」。`;
+      return `这是你第 ${a.length} 次来。每一次，你都松开了一点。`;
+    },
     streak() {
       const a = this.all(); if (!a.length) return 0;
       const days = new Set(a.map(r => new Date(r.t).toISOString().slice(0, 10)));
@@ -267,6 +286,7 @@
     $('#totalSessions').textContent = Store.all().length;
     const ad = Store.avgDrop();
     $('#avgDrop').textContent = ad == null ? '—' : ('-' + ad.toFixed(1));
+    $('#homeInsight').textContent = Store.insight(); // 照见
   }
 
   /* =================================================================
@@ -293,7 +313,6 @@
   }
   buildEmotions();
   $('#intensity').addEventListener('input', e => {
-    $('#intensityVal').textContent = e.target.value;
     session.before = +e.target.value;
   });
   $('#toVent').addEventListener('click', () => { session.before = +$('#intensity').value; go('vent-select'); });
@@ -515,16 +534,23 @@
    * 13) 复盘 + 保存
    * ================================================================= */
   $('#afterIntensity').addEventListener('input', e => {
-    $('#afterVal').textContent = e.target.value; session.after = +e.target.value; renderReflect();
+    session.after = +e.target.value; renderReflect();
   });
   function renderReflect() {
     session.after = +$('#afterIntensity').value;
     const drop = session.before - session.after;
     const card = $('#resultCard');
-    let cls, txt, head;
-    if (drop > 0) { cls = 'down'; head = `↓ ${drop} 分`; txt = `从 ${session.before} 降到 ${session.after}。看，你把它发出去了，也平复下来了。`; }
-    else if (drop === 0) { cls = 'same'; head = '持平'; txt = `还停在 ${session.after} 分？没关系，可以再发泄一轮，或多做几次呼吸。`; }
-    else { cls = 'up'; head = `↑ ${-drop} 分`; txt = '分数升高很正常——深呼吸通常需要几分钟才起效。要不要再做一组呼吸？'; }
+    let cls, head, txt;
+    if (drop > 0) {
+      cls = 'down'; head = '你刚才，做回了一会儿自己。';
+      txt = `那口气，从 ${session.before} 松到了 ${session.after}。憋着的，你发出来了。`;
+    } else if (drop === 0) {
+      cls = 'same'; head = '还堵着，没关系。';
+      txt = '有些气，一下子下不去。要不要再发一轮，或者多陪自己呼吸几次？';
+    } else {
+      cls = 'up'; head = '更翻涌了？很正常。';
+      txt = '深呼吸常常要过几分钟才起效。再陪自己慢慢呼吸一组，别急。';
+    }
     card.innerHTML = `<div class="big-drop ${cls}">${head}</div><div>${txt}</div>`;
   }
   $('#saveSession').addEventListener('click', () => {

@@ -20,13 +20,14 @@
       <div class="home-inner">
         <div class="brand">
           <div class="logo">Bad<span>To</span>Go</div>
-          <p class="tagline">坏情绪，打包带走。</p>
+          <p class="tagline">在这儿，你可以不懂事。</p>
         </div>
+        <p class="insight" id="homeInsight"></p>
         <div class="streak-card" id="streakCard">
           <div class="streak-num"><span id="streakNum">0</span><small>天连续</small></div>
           <div class="streak-meta">
             <div><b id="totalSessions">0</b><span>次清空</span></div>
-            <div><b id="avgDrop">—</b><span>平均降幅</span></div>
+            <div><b id="avgDrop">—</b><span>平均松了</span></div>
           </div>
         </div>
         <button class="btn-primary big" data-go="checkin">我现在很烦 → 开始</button>
@@ -40,39 +41,37 @@
     <!-- ===================== Check-in ===================== -->
     <section class="screen" data-screen="checkin">
       <div class="step-head">
-        <span class="step-tag">第 1 步 · 命名它</span>
-        <h2>你现在主要是什么情绪？</h2>
-        <p class="hint">能说出名字，就已经开始掌控它。</p>
+        <h2>现在，是什么在堵着你？</h2>
+        <p class="hint">不用想太清楚，挑个最像的就行。说出来，它就没那么堵了。</p>
       </div>
       <div class="emotion-grid" id="emotionGrid"></div>
       <div class="slider-wrap">
-        <label>强烈程度：<b><span id="intensityVal">5</span></b> / 10</label>
+        <label>这口气，有多重？</label>
         <input type="range" id="intensity" min="0" max="10" value="5" />
-        <div class="slider-scale"><span>平静</span><span>快爆炸</span></div>
+        <div class="slider-scale"><span>还好</span><span>快炸了</span></div>
       </div>
-      <button class="btn-primary" id="toVent" disabled>选个方式发泄 →</button>
+      <button class="btn-primary" id="toVent" disabled>把它发出来 →</button>
       <button class="link back" data-go="home">返回</button>
     </section>
 
     <!-- ===================== 选择发泄模式 ===================== -->
     <section class="screen" data-screen="vent-select">
       <div class="step-head">
-        <span class="step-tag">第 2 步 · 发出去</span>
-        <h2>你想怎么发泄？</h2>
-        <p class="hint">选一个，把它发出去。</p>
+        <h2>想怎么发出来？</h2>
+        <p class="hint">怎么来都行，没人拦着你。</p>
       </div>
       <div class="mode-grid">
         <button class="mode-card" data-mode="shred">
-          <div class="mode-ico">✍️</div><b>撕掉</b><span>写下来，撕得粉碎</span>
+          <div class="mode-ico">✍️</div><b>撕掉</b><span>写下来，撕碎它</span>
         </button>
         <button class="mode-card" data-mode="smash">
           <div class="mode-ico">🔨</div><b>砸碎</b><span>砸个稀巴烂</span>
         </button>
         <button class="mode-card" data-mode="scream">
-          <div class="mode-ico">📣</div><b>吼出来</b><span>对着麦克风吼</span>
+          <div class="mode-ico">📣</div><b>吼出来</b><span>对着它吼</span>
         </button>
         <button class="mode-card" data-mode="punch">
-          <div class="mode-ico">🥊</div><b>捶打</b><span>连击出气筒</span>
+          <div class="mode-ico">🥊</div><b>捶打</b><span>往死里捶</span>
         </button>
       </div>
       <button class="link back" data-go="checkin">返回</button>
@@ -80,24 +79,24 @@
 
     <!-- ===================== 撕掉 ===================== -->
     <section class="screen vent" data-screen="vent-shred">
-      <div class="vent-head"><h2>把烦你的事写下来</h2><p class="hint">没人会看到，写完就让它灰飞烟灭。文字只在你这台设备，绝不上传。</p></div>
+      <div class="vent-head"><h2>想骂什么，就骂什么</h2><p class="hint">没人会看到，也没人会评判你。写完，让它灰飞烟灭。文字只在你这台设备，绝不上传。</p></div>
       <textarea id="shredText" placeholder="今天最让我受不了的是……" maxlength="2000"></textarea>
       <div class="shred-actions">
         <button class="chip" data-shred="tear">撕碎</button>
         <button class="chip" data-shred="burn">烧掉</button>
         <button class="chip" data-shred="hole">扔进黑洞</button>
       </div>
-      <button class="link skip" data-vent-done>发泄够了 → 平复一下</button>
+      <button class="link skip" data-vent-done>发够了，喘口气 →</button>
     </section>
 
     <!-- ===================== 砸碎 ===================== -->
     <section class="screen vent" data-screen="vent-smash">
-      <div class="vent-head"><h2>砸它！</h2><p class="hint">点或拖，把它砸个稀巴烂。</p></div>
+      <div class="vent-head"><h2>砸它，砸个稀巴烂</h2><p class="hint">点或拖，使劲砸。没人会说你。</p></div>
       <div class="smash-stage" id="smashStage">
         <div class="smash-counter">已砸碎 <b id="smashCount">0</b></div>
         <div class="smash-target" id="smashTarget" role="button" aria-label="砸碎目标"></div>
       </div>
-      <button class="link skip" data-vent-done>发泄够了 → 平复一下</button>
+      <button class="link skip" data-vent-done>发够了，喘口气 →</button>
     </section>
 
     <!-- ===================== 吼出来 ===================== -->
@@ -109,26 +108,25 @@
         <div class="scream-peak">峰值音量 <b id="screamPeak">0</b></div>
       </div>
       <button class="btn-primary" id="screamStart">开启麦克风</button>
-      <button class="link skip" data-vent-done>发泄够了 → 平复一下</button>
+      <button class="link skip" data-vent-done>发够了，喘口气 →</button>
     </section>
 
     <!-- ===================== 捶打 ===================== -->
     <section class="screen vent" data-screen="vent-punch">
-      <div class="vent-head"><h2>捶它！</h2><p class="hint">连续点击/敲打，打出连击。</p></div>
+      <div class="vent-head"><h2>捶它，往死里捶</h2><p class="hint">连着捶，打出连击。手别停。</p></div>
       <div class="punch-stage">
         <div class="combo" id="comboLabel">连击 <b id="comboNum">0</b></div>
         <div class="punch-bag" id="punchBag" role="button" aria-label="出气筒">🥊</div>
         <div class="punch-total">累计 <b id="punchTotal">0</b> 拳</div>
       </div>
-      <button class="link skip" data-vent-done>发泄够了 → 平复一下</button>
+      <button class="link skip" data-vent-done>发够了，喘口气 →</button>
     </section>
 
     <!-- ===================== 呼吸平复 ===================== -->
     <section class="screen" data-screen="breathe">
       <div class="step-head">
-        <span class="step-tag">第 3 步 · 平复</span>
-        <h2>跟着圆圈呼吸</h2>
-        <p class="hint">发泄完别停在最激动的点。慢呼吸能把身体拉回平静——这一步才真正有用。</p>
+        <h2>跟着圆圈，把自己接回来</h2>
+        <p class="hint">刚才那口气，你发出来了。别停在最激动的点——慢慢呼吸，让自己落地。</p>
       </div>
       <div class="breathe-stage">
         <div class="breathe-orb" id="breatheOrb"><span id="breathePhase">准备</span></div>
@@ -139,23 +137,22 @@
         <button class="chip" data-pattern="exhale">延长呼气 4-6</button>
       </div>
       <button class="btn-primary" id="breatheStart">开始呼吸</button>
-      <button class="link skip" id="toReflect">够了，看看效果 →</button>
+      <button class="link skip" id="toReflect">好了 →</button>
     </section>
 
     <!-- ===================== 复盘 ===================== -->
     <section class="screen" data-screen="reflect">
       <div class="step-head">
-        <span class="step-tag">第 4 步 · 看见变化</span>
-        <h2>现在感觉怎么样？</h2>
-        <p class="hint">再给现在的情绪打个分。</p>
+        <h2>现在，心里那口气还在吗？</h2>
+        <p class="hint">就此刻，凭感觉。</p>
       </div>
       <div class="slider-wrap">
-        <label>现在的强烈程度：<b><span id="afterVal">3</span></b> / 10</label>
+        <label>现在呢？</label>
         <input type="range" id="afterIntensity" min="0" max="10" value="3" />
-        <div class="slider-scale"><span>平静</span><span>快爆炸</span></div>
+        <div class="slider-scale"><span>还好</span><span>快炸了</span></div>
       </div>
       <div class="result-card" id="resultCard"></div>
-      <button class="btn-primary" id="saveSession">完成 · 记录这次</button>
+      <button class="btn-primary" id="saveSession">好了，记一笔</button>
       <button class="link" id="toShare">生成分享卡 →</button>
     </section>
 

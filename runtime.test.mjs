@@ -112,7 +112,8 @@ log(active() === 'reflect', '进入复盘, 实际=' + active());
 const after = $('#afterIntensity'); after.value = '3';
 after.dispatchEvent(new win.Event('input', { bubbles: true }));
 log(BadToGo.session.after === 3, '发泄后强度=3, 实际=' + BadToGo.session.after);
-log($('#resultCard').innerHTML.includes('↓ 5'), '降幅文案显示 ↓5, 实际=' + $('#resultCard').textContent.slice(0, 20));
+log($('#resultCard').textContent.includes('做回') && $('#resultCard').textContent.includes('8') && $('#resultCard').textContent.includes('3'),
+  '复盘文案"做回自己"+前后(8→3), 实际=' + $('#resultCard').textContent.slice(0, 30));
 
 // 保存
 $('#saveSession').dispatchEvent(new win.Event('click', { bubbles: true }));
@@ -122,6 +123,9 @@ log(saved[0].before === 8 && saved[0].after === 3 && saved[0].mode === 'smash',
   '记录内容正确: before=8 after=3 mode=smash, 实际=' + JSON.stringify(saved[0]).slice(0, 80));
 log(active() === 'home', '保存后回到首页, 实际=' + active());
 log($('#totalSessions').textContent === '1', '首页累计次数=1, 实际=' + $('#totalSessions').textContent);
+
+// 显影：首页应出现一句"照见"（基于本地数据，非空）
+log($('#homeInsight').textContent.trim().length > 0, '首页显影文案非空, 实际=' + $('#homeInsight').textContent);
 
 // P1 漏斗指标：1 次开始 + 1 次完成 → 完成率 100%
 log(BadToGo.Store.starts() === 1, '漏斗起点计数=1, 实际=' + BadToGo.Store.starts());
