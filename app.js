@@ -270,6 +270,11 @@
   function onEnter(name) {
     // 离开发泄动作页就收起发泄弧（撕掉模式不用弧）
     if (!/^vent-(smash|punch|scream)$/.test(name)) Arc.hide();
+    // 发泄方式切换条：在任意发泄页显示，并高亮当前方式
+    const inVent = /^vent-(shred|smash|scream|punch)$/.test(name);
+    document.body.classList.toggle('in-vent', inVent);
+    $('#ventSwitch').classList.toggle('on', inVent);
+    if (inVent) $$('#ventSwitch button').forEach(b => b.classList.toggle('cur', 'vent-' + b.dataset.switch === name));
     if (name === 'home') renderHome();
     if (name === 'breathe') resetBreathe();
     if (name === 'reflect') renderReflect();
@@ -306,6 +311,12 @@
       hud.classList.add('on'); document.body.classList.add('venting');
       render();
     }
+    // 切换发泄方式时调用：重新显示 HUD 但保留已蓄的能量（共享弧）
+    function resume() {
+      active = true; if (energy < 100) climaxed = false;
+      hud.classList.add('on'); document.body.classList.add('venting');
+      render();
+    }
     function hide() {
       active = false; hud.classList.remove('on'); document.body.classList.remove('venting');
       bg.className = ''; bg.style.opacity = 0;
@@ -337,8 +348,18 @@
         stateEl.textContent = '发够了吗？没够就接着来 · 够了就点下面「喘口气 →」';
       }, 2400);
     }
-    return { show, hide, add, climax, isActive: () => active, energy: () => energy };
+    return { show, resume, hide, add, climax, isActive: () => active, energy: () => energy };
   })();
+
+  // 发泄方式切换条：随时换一种发泄，能量弧共享
+  function switchMode(mode) {
+    if (mode === current.replace('vent-', '')) return;
+    Audio.unlock();
+    session.mode = mode;
+    if (mode === 'shred') Arc.hide(); else Arc.resume(); // 撕掉模式不套弧；其余共享能量
+    go('vent-' + mode);
+  }
+  $$('#ventSwitch button').forEach(b => b.addEventListener('click', () => switchMode(b.dataset.switch)));
 
   /* =================================================================
    * 5) 首页
@@ -754,7 +775,7 @@
     document.addEventListener(ev, () => Audio.unlock(), { passive: true }));
 
   // 显示版本号（方便确认是否刷到最新版）
-  const APP_VERSION = 'v1.4.3';
+  const APP_VERSION = 'v1.5.0';
   $$('.app-ver').forEach(el => { el.textContent = 'BadToGo ' + APP_VERSION; });
 
   renderHome();

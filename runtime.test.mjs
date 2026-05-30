@@ -161,6 +161,19 @@ for (let i = 0; i < 20; i++) { const ev = new win.Event('pointerdown', { bubbles
 log(BadToGo.Arc.energy() >= 100, '发泄弧能量蓄满, 实际=' + BadToGo.Arc.energy());
 log($('#arcState').textContent.includes('全部'), '触发"爆"文案(全部发出去了), 实际=' + $('#arcState').textContent);
 
+// 第四批：发泄方式切换 —— 能量弧共享（切换不清零）
+BadToGo.go('vent-select');
+[...win.document.querySelectorAll('.mode-card')].find(c => c.dataset.mode === 'smash')
+  .dispatchEvent(new win.Event('click', { bubbles: true })); // Arc.show 重置能量=0
+const tgt3 = $('#smashTarget');
+for (let i = 0; i < 3; i++) { const ev = new win.Event('pointerdown', { bubbles: true }); ev.clientX = 50; ev.clientY = 50; tgt3.dispatchEvent(ev); }
+const e1 = BadToGo.Arc.energy(); // 应为 18
+log($('#ventSwitch').classList.contains('on'), '发泄页显示方式切换条');
+win.document.querySelector('#ventSwitch button[data-switch="punch"]').dispatchEvent(new win.Event('click', { bubbles: true }));
+log(active() === 'vent-punch', '切换到捶打, 实际=' + active());
+log(BadToGo.Arc.energy() === e1 && e1 === 18, `切换后能量保留(共享弧), 切前=${e1} 切后=${BadToGo.Arc.energy()}`);
+log(win.document.querySelector('#ventSwitch button[data-switch="punch"]').classList.contains('cur'), '切换条高亮当前=捶打');
+
 // 最终：页面内不应有 console.error
 log(errors.length === 0, '页面运行期 console.error 数=' + errors.length + (errors.length ? ' :: ' + errors.slice(0, 3).join(' | ') : ''));
 

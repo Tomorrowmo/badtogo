@@ -41,6 +41,17 @@ body{
 .arc-state.burst{color:#ff5a4d;font-size:18px}
 .arc-state.calm{color:var(--calm)}
 body.venting .screen.vent{padding-top:76px}
+body.in-vent .screen.vent{padding-bottom:88px}
+/* 发泄方式切换条 */
+#ventSwitch{position:fixed;bottom:0;left:0;right:0;z-index:60;display:none;justify-content:center;gap:8px;
+  padding:8px 12px calc(8px + var(--safe-b));background:linear-gradient(0deg,rgba(11,13,23,.96),rgba(11,13,23,0))}
+#ventSwitch.on{display:flex}
+#ventSwitch button{background:var(--card);border:1px solid var(--line);border-radius:14px;color:var(--ink);
+  padding:8px 16px;font-size:20px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;line-height:1;transition:.15s}
+#ventSwitch button span{font-size:11px;color:var(--muted)}
+#ventSwitch button.cur{border-color:var(--hot);background:rgba(255,90,77,.16)}
+#ventSwitch button.cur span{color:#fff}
+#ventSwitch button:active{transform:scale(.94)}
 @keyframes arcshake{10%,90%{transform:translate(-2px,1px)}20%,80%{transform:translate(4px,-2px)}30%,50%,70%{transform:translate(-7px,2px)}40%,60%{transform:translate(7px,-1px)}}
 #app.arc-shake{animation:arcshake .5s}
 /* 个性化靶子：把惹到你的那件事写在上面 */
